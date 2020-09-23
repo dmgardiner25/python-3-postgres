@@ -10,7 +10,7 @@
 | *Definition type* | Docker Compose |
 | *Works in Codespaces* | Yes |
 | *Container host OS support* | Linux, macOS, Windows |
-| *Languages, platforms* | Python |
+| *Languages, platforms* | Python |    
 
 ## Using this definition with an existing folder
 
