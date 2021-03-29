@@ -7,10 +7,12 @@
 | Metadata | Value |
 |----------|-------|
 | *Contributors* | The [VS Code Python extension](https://marketplace.visualstudio.com/itemdetails?itemName=ms-python.python) team |
+| *Categories* | Core, Languages |
 | *Definition type* | Docker Compose |
 | *Works in Codespaces* | Yes |
 | *Container host OS support* | Linux, macOS, Windows |
-| *Languages, platforms* | Python |    
+| *Container OS* | Debian |
+| *Languages, platforms* | Python |
 
 ## Using this definition with an existing folder
 
@@ -43,7 +45,7 @@ network_mode: service:db
 
 ### Installing Node.js
 
-Given how frequently Python-based web applications use Node.js for front end code, this container also includes Node.js. You can change the version of Node.js installed or disable its installation by updating the `args` property in `.devcontainer/docker-compose.yml`.
+Given JavaScript front-end web client code written for use in conjunction with a Python back-end often requires the use of Node.js-based utilities to build, this container also includes `nvm` so that you can easily install Node.js. You can change the version of Node.js installed or disable its installation by updating the `args` property in `.devcontainer/docker-compose.yml`.
 
 ```json
 args:
@@ -112,11 +114,13 @@ If you prefer, you can add the following to your `Dockerfile` to cause global in
 
 ```Dockerfile
 ENV PIP_TARGET=/usr/local/pip-global
-ENV PYTHONPATH=${PIP_TARGET}:${PYTHONPATH} \
-    PATH=${PIP_TARGET}/bin:${PATH}
-RUN mkdir -p ${PIP_TARGET} \
-    && chown vscode:root ${PIP_TARGET} \
-    && echo "if [ \"\$(stat -c '%U' ${PIP_TARGET})\" != \"vscode\" ]; then sudo chown -R vscode:root ${PIP_TARGET}; fi" | tee -a /etc/bash.bashrc >> /etc/zsh/zshrc
+ENV PYTHONPATH=${PIP_TARGET}:${PYTHONPATH}
+ENV PATH=${PIP_TARGET}/bin:${PATH}
+RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd -r pip-global; fi \
+    && usermod -a -G pip-global vscode \
+    && umask 0002 && mkdir -p ${PIP_TARGET} \
+    && chown :pip-global ${PIP_TARGET} \
+    && ( [ ! -f "/etc/profile.d/00-restore-env.sh" ] || sed -i -e "s/export PATH=/export PATH=\/usr\/local\/pip-global:/" /etc/profile.d/00-restore-env.sh )
 ```
 
 ### Adding the definition to your folder
