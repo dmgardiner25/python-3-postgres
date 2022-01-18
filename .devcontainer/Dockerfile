@@ -2,6 +2,8 @@
 ARG VARIANT=3
 FROM mcr.microsoft.com/vscode/devcontainers/python:${VARIANT}
 
+RUN sleep 10
+
 ENV PYTHONUNBUFFERED 1
 
 # Update args in docker-compose.yaml to set the UID/GID of the "vscode" user.
